@@ -1,0 +1,9 @@
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\bin\Debug\RPGSimAlpha.exe.config
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\bin\Debug\RPGSimAlpha.exe
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\bin\Debug\RPGSimAlpha.pdb
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\bin\Debug\OpenTK.dll
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\bin\Debug\OpenTK.pdb
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\bin\Debug\OpenTK.xml
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\obj\Debug\RPGSimAlpha.csprojResolveAssemblyReference.cache
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\obj\Debug\RPGSimAlpha.exe
+C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\obj\Debug\RPGSimAlpha.pdb
