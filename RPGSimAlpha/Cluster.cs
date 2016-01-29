@@ -135,7 +135,6 @@ namespace RPGSimAlpha
         {
             Texture2D texture = Resources.IO.GetTexture(block.Type, textureSize);
             Vector2 currentPosition = (localPosition * textureSize) + (positionTopLeft * textureSize);
-            return;
             if (windowFrame.IntersectsWith(new RectangleF(currentPosition.X, currentPosition.Y, Resources.IO.TextureSizeLarge * 1.5f, textureSize * 1.5f)))
                 SpriteBatch.Draw(texture, currentPosition, new Vector2(1f), Color.White, Vector2.Zero, null, -CurrentRotation);
         }

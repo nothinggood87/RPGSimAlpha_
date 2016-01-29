@@ -43,8 +43,8 @@ namespace RPGSimAlpha
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.BlendEquation(BlendEquationMode.Max);
             View = new View(Vector2.Zero, 0.0, 1);
-            Input.Initialize(this);
             Resources.Master.Initualize();
+            Input.Initialize(this);
         }
         protected override void OnLoad(EventArgs e)
         {

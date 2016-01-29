@@ -122,13 +122,15 @@ namespace RPGSimAlpha
         }
         public void ApplyTransform()
         {
+            //adjusts for texture size changes
+            float zoom = (float)(Zoom * (16 /CurrentTextureSize));
             try
             {
                 Matrix4 transform = Matrix4.Identity;
 
                 transform = Matrix4.Mult(transform,Matrix4.CreateTranslation(-Position.X, -Position.Y, 0));
                 transform = Matrix4.Mult(transform,Matrix4.CreateRotationZ(-(float)Rotation));
-                transform = Matrix4.Mult(transform,Matrix4.CreateScale((float)Zoom, (float)Zoom, 1.0f));
+                transform = Matrix4.Mult(transform,Matrix4.CreateScale(zoom, zoom, 1.0f));
                 GL.MultMatrix(ref transform);
             }
             catch

@@ -9,13 +9,15 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Xml;
 
+
 namespace RPGSimAlpha
 {
     namespace Resources
     {
         static class IO
         {
-            public const string ResourceFileLocation = @"C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\Resources\";
+
+            public static string ResourceFileLocation { get; private set; }
             private static Texture2D LoadTexture(byte textureSize,string path)
             {
                 if (!File.Exists(ResourceFileLocation + textureSize + @"\" + path))
@@ -50,6 +52,14 @@ namespace RPGSimAlpha
             private static Texture2D[][] TexturesSmall { get; set; }
             public static void Initualize()
             {
+                Console.WriteLine("Resources.IO---Initualizing");
+                char[] rawLocation = Directory.GetCurrentDirectory().ToCharArray();
+                ResourceFileLocation = "";
+                for (short i = 0; i < rawLocation.Length-9; i++)
+                {
+                    ResourceFileLocation += rawLocation[i];
+                }
+                ResourceFileLocation += @"Resources\";
                 {
                     TexturesLarge = new Texture2D[3][];
                     int size = Enum.GetNames(typeof(Craft)).Length;
@@ -92,6 +102,7 @@ namespace RPGSimAlpha
                         TexturesSmall[2][i] = LoadTexture(TextureSizeSmall, @"Generic\" + Enum.GetName(typeof(Generic), i) + ".bmp");
                     }
                 }
+                Console.WriteLine("Resources.IO---Initualized");
             }
             public static Texture2D GetTexture(BlockRegistry.BlockTypes name,byte textureSize)
             {

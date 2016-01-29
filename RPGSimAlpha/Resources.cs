@@ -17,6 +17,7 @@ namespace RPGSimAlpha
             public static void Initualize()
             {
                 IO.Initualize();
+                
             }
         }
     }
