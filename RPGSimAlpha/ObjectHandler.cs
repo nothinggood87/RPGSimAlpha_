@@ -28,12 +28,12 @@ namespace RPGSimAlpha
             }
             //Render();
         }
-        public void Render(System.Drawing.RectangleF windowFrame)
+        public void Render(System.Drawing.RectangleF windowFrame, byte textureSize)
         {
             Cluster[] clusters = Clusters.ToArray();
             for (int i = 0; i < clusters.Length; i++)
             {
-                clusters[i].Draw(windowFrame);
+                clusters[i].Draw(windowFrame,textureSize);
             }
         }
     }

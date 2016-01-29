@@ -11,6 +11,27 @@ namespace RPGSimAlpha
 {
     class Game : GameWindow
     {
+        public short tick = 0;
+        public short TICK
+        {
+            get
+            {
+                return tick;
+            }
+            set
+            {
+                bool stillTrying = true;
+                while(stillTrying)
+                {
+                    try
+                    {
+                        tick = value;
+                        stillTrying = false;
+                    }
+                    catch { }
+                }
+            }
+        }
         public const int TileSize = 16;
         public ObjectHandler ObjHandler { get; } = new ObjectHandler();
         View View { get; }
@@ -32,6 +53,7 @@ namespace RPGSimAlpha
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            TICK++;
             base.OnUpdateFrame(e);
             RefreshViewBounds();
             ObjHandler.Update(View);
@@ -48,7 +70,7 @@ namespace RPGSimAlpha
             SpriteBatch.Begin(this.Width, this.Height);
             View.ApplyTransform();
             //player.Draw();
-            ObjHandler.Render(ViewBounds);
+            ObjHandler.Render(ViewBounds,View.CurrentTextureSize);
             this.SwapBuffers();
         }
         public RectangleF ViewBounds { get; private set; }

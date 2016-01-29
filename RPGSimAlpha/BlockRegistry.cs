@@ -10,7 +10,6 @@ namespace RPGSimAlpha
     {
         static class BlockRegistry
         {
-            public const int TextureSize = 16;
             public enum BlockTypes
             {
                 ThrusterIon = 0,

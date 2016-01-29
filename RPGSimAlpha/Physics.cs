@@ -12,7 +12,6 @@ namespace RPGSimAlpha
         static class Physics
         {
             public static Texture2D[] Textures { get; private set; }
-            public const short TextureSize = 16;
             /// <summary>
             /// placeHolder
             /// </summary>

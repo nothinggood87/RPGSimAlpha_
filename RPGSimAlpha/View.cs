@@ -33,7 +33,15 @@ namespace RPGSimAlpha
         private TweenType TwnType { get; set; }
         private int CurrentStep { get; set; }
         private int TweenSteps { get; set; }
-
+        public byte CurrentTextureSize
+        {
+            get
+            {
+                if(Zoom * Resources.IO.TextureSizeLarge <= Resources.IO.TextureSizeSmall)
+                    return Resources.IO.TextureSizeSmall;
+                return Resources.IO.TextureSizeLarge;
+            }
+        }
         public View(Vector2 startPosition,double startRotation = 1.0,double startZoom = 1.0)
         {
             Position = startPosition;
@@ -128,13 +136,6 @@ namespace RPGSimAlpha
                 //Console.WriteLine(this.ToString() + ".ApplyTransform()--Faild");
                 throw null;
             }
-        }
-        public Vector2 ToWorld(Vector2 input)
-        {
-            input /= (float)Zoom;
-            Vector2 dX = new Vector2((float)Math.Cos(Rotation), (float)Math.Sin(Rotation));
-            Vector2 dY = new Vector2((float)Math.Cos(Rotation + MathHelper.PiOver2), (float)Math.Sin(Rotation + MathHelper.PiOver2));
-            return (this.Position + dX * input.X + dY * input.Y);
         }
     }
 }

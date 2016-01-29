@@ -16,15 +16,15 @@ namespace RPGSimAlpha
         static class IO
         {
             public const string ResourceFileLocation = @"C:\Repos\RPGSim\RPGSimAlpha\RPGSimAlpha\Resources\";
-            public static Texture2D LoadTexture(string path)
+            private static Texture2D LoadTexture(byte textureSize,string path)
             {
-                if (!File.Exists(ResourceFileLocation + path))
+                if (!File.Exists(ResourceFileLocation + textureSize + @"\" + path))
                 {
-                    throw new FileNotFoundException(@"File not found at '" + ResourceFileLocation + path + "'");
+                    throw new FileNotFoundException(@"File not found at '" + ResourceFileLocation + textureSize + @"\" + path + "'");
                 }
                 int id = GL.GenTexture();
                 GL.BindTexture(TextureTarget.Texture2D, id);
-                Bitmap bmp = new Bitmap(ResourceFileLocation + path);
+                Bitmap bmp = new Bitmap(ResourceFileLocation + textureSize + @"\" + path);
 
                 BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly,
                     System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -44,35 +44,69 @@ namespace RPGSimAlpha
 
                 return new Texture2D(id, bmp.Width, bmp.Height);
             }
-            private static Texture2D[][] Textures { get; set; }
+            public const byte TextureSizeLarge = 16;
+            public const byte TextureSizeSmall = 4;
+            private static Texture2D[][] TexturesLarge { get; set; }
+            private static Texture2D[][] TexturesSmall { get; set; }
             public static void Initualize()
             {
-                Textures = new Texture2D[3][];
-                int size = Enum.GetNames(typeof(Craft)).Length;
-                Textures[0] = new Texture2D[size];
-                for(short i = 0; i < size; i++)
                 {
-                    Textures[0][i] = LoadTexture(@"Craft\" + Enum.GetName(typeof(Craft), i) + ".bmp");
+                    TexturesLarge = new Texture2D[3][];
+                    int size = Enum.GetNames(typeof(Craft)).Length;
+                    TexturesLarge[0] = new Texture2D[size];
+                    for (short i = 0; i < size; i++)
+                    {
+                        TexturesLarge[0][i] = LoadTexture(TextureSizeLarge,@"Craft\" + Enum.GetName(typeof(Craft), i) + ".bmp");
+                    }
+                    size = Enum.GetNames(typeof(Player)).Length;
+                    TexturesLarge[1] = new Texture2D[size];
+                    for (short i = 0; i < size; i++)
+                    {
+                        TexturesLarge[1][i] = LoadTexture(TextureSizeLarge, @"Player\" + Enum.GetName(typeof(Player), i) + ".png");
+                    }
+                    size = Enum.GetNames(typeof(Generic)).Length;
+                    TexturesLarge[2] = new Texture2D[size];
+                    for (short i = 0; i < size; i++)
+                    {
+                        TexturesLarge[2][i] = LoadTexture(TextureSizeLarge, @"Generic\" + Enum.GetName(typeof(Generic), i) + ".bmp");
+                    }
                 }
-                size = Enum.GetNames(typeof(Player)).Length;
-                Textures[1] = new Texture2D[size];
-                for (short i = 0; i < size; i++)
                 {
-                    Textures[1][i] = LoadTexture(@"Player\" + Enum.GetName(typeof(Player), i) + ".png");
-                }
-                size = Enum.GetNames(typeof(Generic)).Length;
-                Textures[2] = new Texture2D[size];
-                for (short i = 0; i < size; i++)
-                {
-                    Textures[2][i] = LoadTexture(@"Generic\" + Enum.GetName(typeof(Generic), i) + ".bmp");
+                    TexturesSmall = new Texture2D[3][];
+                    int size = Enum.GetNames(typeof(Craft)).Length;
+                    TexturesSmall[0] = new Texture2D[size];
+                    for (short i = 0; i < size; i++)
+                    {
+                        TexturesSmall[0][i] = LoadTexture(TextureSizeSmall, @"Craft\" + Enum.GetName(typeof(Craft), i) + ".bmp");
+                    }
+                    size = Enum.GetNames(typeof(Player)).Length;
+                    TexturesSmall[1] = new Texture2D[size];
+                    for (short i = 0; i < size; i++)
+                    {
+                        TexturesSmall[1][i] = LoadTexture(TextureSizeSmall, @"Player\" + Enum.GetName(typeof(Player), i) + ".png");
+                    }
+                    size = Enum.GetNames(typeof(Generic)).Length;
+                    TexturesSmall[2] = new Texture2D[size];
+                    for (short i = 0; i < size; i++)
+                    {
+                        TexturesSmall[2][i] = LoadTexture(TextureSizeSmall, @"Generic\" + Enum.GetName(typeof(Generic), i) + ".bmp");
+                    }
                 }
             }
-            public static Texture2D[] GetTextureArray(CoreTypes type) => Textures[(int)type];
-            public static Texture2D GetTexture(BlockRegistry.BlockTypes name)
+            public static Texture2D GetTexture(BlockRegistry.BlockTypes name,byte textureSize)
             {
-                if (name > BlockRegistry.BlockTypes.WingRightEdge)
-                    return Textures[(int)CoreTypes.Generic][(int)(name - BlockRegistry.BlockTypes.WingRightEdge)];
-                return Textures[(int)CoreTypes.Craft][(int)name];
+                if (textureSize == 16)
+                {
+                    if (name > BlockRegistry.BlockTypes.WingRightEdge)
+                        return TexturesLarge[(int)CoreTypes.Generic][(int)(name - BlockRegistry.BlockTypes.WingRightEdge)];
+                    return TexturesLarge[(int)CoreTypes.Craft][(int)name];
+                }
+                else
+                {
+                    if (name > BlockRegistry.BlockTypes.WingRightEdge)
+                        return TexturesSmall[(int)CoreTypes.Generic][(int)(name - BlockRegistry.BlockTypes.WingRightEdge)];
+                    return TexturesSmall[(int)CoreTypes.Craft][(int)name];
+                }
             }
             /// <summary>
             /// core texture types

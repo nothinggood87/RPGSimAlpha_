@@ -83,6 +83,19 @@ namespace RPGSimAlpha
                 distance* (float)Math.Cos(theta),
                 distance* (float)Math.Sin(theta)
                 );
+            /// <summary>
+            /// x = distance |
+            /// y = theta   
+            /// </summary>
+            /// <param name="coords"></param>
+            /// <returns></returns>
+            public static OpenTK.Vector2 GetPolarCoords(OpenTK.Vector2 coords)
+            {
+                OpenTK.Vector2 returnValue = new OpenTK.Vector2((float)Math.Sqrt(Math.Pow(coords.X, 2) + Math.Pow(coords.Y, 2)),(float)Math.Atan(coords.Y/coords.X));
+                if (returnValue.Y == float.NaN)
+                    returnValue.Y = (float)Math.Atan(coords.Y + 0.001 / coords.X + 0.001);
+                return returnValue;
+            }
         }
     }
 }

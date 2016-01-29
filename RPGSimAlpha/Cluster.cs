@@ -38,7 +38,7 @@ namespace RPGSimAlpha
         }
         public Cluster(Shape shape,Resources.BlockRegistry.BlockTypes type,Vector2 positionTopLeft,Vector2 velocity,float rotation, short valueA,short valueB,Controller.ControlType leader)
         {
-            Leader = new Controller(leader);
+            Leader = new Controller(leader,this);
             Rotation = rotation;
             this.velocity = velocity;
             bool circle = false;
@@ -84,7 +84,7 @@ namespace RPGSimAlpha
         }
         public Cluster(Block[,] grid,Vector2 positionTopLeft, Vector2 velocity, float rotation,Controller.ControlType leader)
         {
-            Leader = new Controller(leader);
+            Leader = new Controller(leader,this);
             Grid = grid;
             Rotation = rotation;
             this.velocity = velocity;
@@ -121,25 +121,27 @@ namespace RPGSimAlpha
                 return Grid.GetLength(1);
             }
         }
-        public void Draw(RectangleF windowFrame)
+        public void Draw(RectangleF windowFrame,byte textureSize)
         {
             for (short x = 0; x < Grid.GetLength(0); x++)
             {
                 for (short y = 0; y < Grid.GetLength(1); y++)
                 {
-                    Draw(Grid[x,y], CalculateRotaion(Grid[x,y],x,y),windowFrame);
+                    Draw(Grid[x,y], CalculateRotaion(Grid[x,y],x,y),windowFrame, textureSize);
                 }
             }
         }
-        private void Draw(Block block,Vector2 localPosition,RectangleF windowFrame)
+        private void Draw(Block block,Vector2 localPosition,RectangleF windowFrame,byte textureSize)
         {
-            Texture2D texture = Resources.IO.GetTexture(block.Type);
-            Vector2 currentPosition = (localPosition * Resources.BlockRegistry.TextureSize) + (positionTopLeft * Resources.BlockRegistry.TextureSize);
-            if (windowFrame.IntersectsWith(new RectangleF(currentPosition.X, currentPosition.Y, Resources.Physics.TextureSize * 1.5f, Resources.Physics.TextureSize * 1.5f)))
+            Texture2D texture = Resources.IO.GetTexture(block.Type, textureSize);
+            Vector2 currentPosition = (localPosition * textureSize) + (positionTopLeft * textureSize);
+            return;
+            if (windowFrame.IntersectsWith(new RectangleF(currentPosition.X, currentPosition.Y, Resources.IO.TextureSizeLarge * 1.5f, textureSize * 1.5f)))
                 SpriteBatch.Draw(texture, currentPosition, new Vector2(1f), Color.White, Vector2.Zero, null, -CurrentRotation);
         }
         private Vector2 CalculateRotaion(Block block,short x,short y)
         {
+            //about half
             //getting base values
             float X = x - CenterOfMass.X;
             float Y = y - CenterOfMass.Y;
