@@ -53,10 +53,11 @@ namespace RPGSimAlpha
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            View.Refresh();
             TICK++;
             base.OnUpdateFrame(e);
-            RefreshViewBounds();
-            ObjHandler.Update(View);
+            RefreshWindowFrame();
+            ObjHandler.Update(View,WindowFrame);
             //player.Update(level, Input.GetKeyInputVector2(Input.KeysDown), Input.GetKeyInputVector2(Input.KeysDownLast));
             //View.SetPosition(player.Position, View.TweenType.QuarticOut, 60);
             View.Update();
@@ -69,16 +70,15 @@ namespace RPGSimAlpha
             GL.ClearColor(Color.Black);
             SpriteBatch.Begin(this.Width, this.Height);
             View.ApplyTransform();
-            //player.Draw();
-            ObjHandler.Render(ViewBounds,View.CurrentTextureSize);
+            ObjHandler.Render(WindowFrame,View);
             this.SwapBuffers();
         }
-        public RectangleF ViewBounds { get; private set; }
-        private void RefreshViewBounds()
+        public RectangleF WindowFrame { get; private set; }
+        private void RefreshWindowFrame()
         {
-            ViewBounds = new RectangleF(
-                (View.Position.X - ((Size.Width / 2) / (float)View.Zoom)),(View.Position.Y - ((Size.Height / 2) / (float)View.Zoom)), 
-                Size.Width / (float)View.Zoom, Size.Height/(float)View.Zoom);
+            WindowFrame = new RectangleF(
+                (View.Position.X - ((Size.Width / 2) / View.Zoom)),(View.Position.Y - ((Size.Height / 2) / View.Zoom)), 
+                Size.Width / View.Zoom, Size.Height/View.Zoom);
         }
     }
 }

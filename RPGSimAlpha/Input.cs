@@ -53,9 +53,23 @@ namespace RPGSimAlpha
             KeysDownLast = new List<Key>(KeysDown);
             ButtonsDownLast = new List<MouseButton>(ButtonsDown);
         }
-
+        /// <summary>
+        /// down last tick and this tick
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool KeyPress(Key key) => (KeysDown.Contains(key) && KeysDownLast.Contains(key));
+        /// <summary>
+        /// not down last tick but down this tick
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool KeyRelease(Key key) => (!KeysDown.Contains(key) && KeysDownLast.Contains(key));
+        /// <summary>
+        /// down this tick
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool KeyDown(Key key) => KeysDown.Contains(key);
 
         public static bool MousePress(MouseButton button) => (ButtonsDown.Contains(button) && ButtonsDownLast.Contains(button));

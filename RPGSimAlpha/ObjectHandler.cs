@@ -19,21 +19,21 @@ namespace RPGSimAlpha
         /// hasPlaceHolder
         /// </summary>
         /// <param name="level"></param>
-        public void Update(View view)
+        public void Update(View view,System.Drawing.RectangleF windowFrame)
         {
             Cluster[] clusters = Clusters.ToArray();
             for (int i = 0; i < clusters.Length; i++)
             {
-                clusters[i].Update(view);//placeHolder
+                clusters[i].Update(view,ref windowFrame);//placeHolder
             }
             //Render();
         }
-        public void Render(System.Drawing.RectangleF windowFrame, byte textureSize)
+        public void Render(System.Drawing.RectangleF windowFrame,View view)
         {
             Cluster[] clusters = Clusters.ToArray();
             for (int i = 0; i < clusters.Length; i++)
             {
-                clusters[i].Draw(windowFrame,textureSize);
+                clusters[i].Draw(view,ref windowFrame);
             }
         }
     }

@@ -9,26 +9,17 @@ using System.IO;
 
 namespace RPGSimAlpha
 {
-    struct Block
+    class Block
     {
         public Resources.BlockRegistry.BlockTypes Type { get; }
-        /// <summary>
-        /// position on the x(Right-Left) axis
-        /// </summary>
-        public short X { get; }
-        /// <summary>
-        /// position on the Y(Up-Down) axis
-        /// </summary>
-        public short Y { get; }
         public bool IsSolid => Resources.BlockRegistry.Registry[(short)Type].IsSolid;
         public bool IsPlatform => Resources.BlockRegistry.Registry[(short)Type].IsPlatform;
         public bool IsLadder => Resources.BlockRegistry.Registry[(short)Type].IsLadder;
         public float Mass => Resources.BlockRegistry.Registry[(short)Type].Mass;
-        public Block(Resources.BlockRegistry.BlockTypes type,short x,short y)
-        {
-            this.X = x;
-            this.Y = y;
-            this.Type = type;
-        }
+        public Texture2D Texture(byte textureSize) => Resources.IO.GetTexture(Type, textureSize);
+        public Block(Resources.BlockRegistry.BlockTypes type)
+        { this.Type = type; }
+        public Vector2 PreciseLocation { get; private set; }
+        public void SetPreciseLocation(Vector2 value) => PreciseLocation = value;
     }
 }

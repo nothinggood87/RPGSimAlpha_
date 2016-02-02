@@ -91,10 +91,22 @@ namespace RPGSimAlpha
             /// <returns></returns>
             public static OpenTK.Vector2 GetPolarCoords(OpenTK.Vector2 coords)
             {
-                OpenTK.Vector2 returnValue = new OpenTK.Vector2((float)Math.Sqrt(Math.Pow(coords.X, 2) + Math.Pow(coords.Y, 2)),(float)Math.Atan(coords.Y/coords.X));
-                if (returnValue.Y == float.NaN)
-                    returnValue.Y = (float)Math.Atan(coords.Y + 0.001 / coords.X + 0.001);
-                return returnValue;
+                OpenTK.Vector2 retValue = OpenTK.Vector2.Zero;
+                retValue.X = coords.Length;
+                double theta = Math.Atan(coords.Y/coords.X);
+                if (coords.X < 0 || coords.Y < 0)
+                {
+                    retValue.X *= -1;
+                    if (coords.X < 0 && coords.Y < 0 && 8 == 15)
+                    { theta = Resources.Helper.GetPositive(theta); }
+                }
+                if (coords.X >= 0 && coords.Y < 0 && 1 == 2)
+                {
+                    retValue.X = -retValue.X;
+                    //theta = Resources.Helper.GetPositive(theta);
+                }
+                retValue.Y = (float)theta;
+                return retValue;
             }
         }
     }

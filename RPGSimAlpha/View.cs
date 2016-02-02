@@ -11,6 +11,24 @@ namespace RPGSimAlpha
 {
     class View
     {
+        /// <summary>
+        /// refreshes all of the general values in this class
+        /// </summary>
+        public void Refresh()
+        {
+            if (Zoom * 16 <= 1)
+                CurrentTextureSize = 1;
+            else if (Zoom * 4 <= 1)
+                CurrentTextureSize = 4;
+            else CurrentTextureSize = MaxTextureSize;
+
+            TextureDensity = (byte)(1 / (Zoom * MaxTextureSize));
+
+            if (TextureDensity == 0)
+                TextureDensity = 1;
+
+        }
+        public const byte MaxTextureSize = 16;
         public enum TweenType
         {
             Instant = 0,
@@ -27,22 +45,15 @@ namespace RPGSimAlpha
         /// <summary>
         /// 1 = default
         /// </summary>
-        public double Zoom { get; set; }
+        public float Zoom { get; set; }
         public Vector2 PositionGoTo { get; private set; }
         private Vector2 PositionFrom { get; set; }
         private TweenType TwnType { get; set; }
         private int CurrentStep { get; set; }
         private int TweenSteps { get; set; }
-        public byte CurrentTextureSize
-        {
-            get
-            {
-                if(Zoom * Resources.IO.TextureSizeLarge <= Resources.IO.TextureSizeSmall)
-                    return Resources.IO.TextureSizeSmall;
-                return Resources.IO.TextureSizeLarge;
-            }
-        }
-        public View(Vector2 startPosition,double startRotation = 1.0,double startZoom = 1.0)
+        public byte CurrentTextureSize { get; private set; } = 16;
+        public byte TextureDensity { get; private set; } = 1;
+        public View(Vector2 startPosition,double startRotation = 1.0,float startZoom = 1.0f)
         {
             Position = startPosition;
             Rotation = startRotation;

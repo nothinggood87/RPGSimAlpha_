@@ -11,7 +11,7 @@ namespace RPGSimAlpha
 {
     class SpriteBatch
     {
-        public static void Draw(Texture2D texture,Vector2 position,Vector2 scale,Color color,Vector2 origin
+        private static void Draw(Texture2D texture,Vector2 position,Vector2 scale,Color color,Vector2 origin
             ,RectangleF? sourceRec = null ,float rotation = 0.0f)
         {
             Vector2[] vertices = new Vector2[4]
@@ -30,8 +30,6 @@ namespace RPGSimAlpha
                           Matrix4.CreateTranslation(0.5f, 0.5f, 0.0f);
                 GL.LoadMatrix(ref matrix);
             }
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.BindTexture(TextureTarget.Texture2D, texture.ID);
             GL.Begin(PrimitiveType.Quads);
@@ -54,8 +52,20 @@ namespace RPGSimAlpha
                 vertices[i] += position;
                 GL.Vertex2(vertices[i]);
             }
-            /*
-            //calculate rotation
+            GL.End();
+        }
+        public static void Draw(Block[,] grid, Vector2 positionTopLeft,ref RectangleF windowFrame,View view, float rotation = 0.0f,bool ForceRender = false)
+        {
+            short width = (short)grid.GetLength(0);
+            short height = (short)grid.GetLength(1);
+            //origin = zero
+            Vector2[] vertices = new Vector2[4]
+            {
+                new Vector2(0,0),
+                new Vector2(1,0),
+                new Vector2(1,1),
+                new Vector2(0,1),
+            };
             GL.MatrixMode(MatrixMode.Texture);
             GL.LoadIdentity();
             if (rotation != 0)
@@ -66,10 +76,36 @@ namespace RPGSimAlpha
                 GL.LoadMatrix(ref matrix);
             }
             GL.MatrixMode(MatrixMode.Modelview);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
-            */
-            GL.End();
+            for (short i = 0; i < width; i++)
+            {
+                for (short j = 0; j < height; j++)
+                {
+                    if (!ForceRender)
+                    {
+                        if ((i % view.TextureDensity == 0 && j % view.TextureDensity == 0))
+                        {
+                            Vector2 currentPosition = (grid[i,j].PreciseLocation * view.CurrentTextureSize) + (positionTopLeft * view.CurrentTextureSize);
+                            if (!windowFrame.IntersectsWith(new RectangleF(currentPosition.X, currentPosition.Y, view.CurrentTextureSize * 1.5f, view.CurrentTextureSize * 1.5f)))
+                                continue;
+                        }
+                    }
+                    GL.BindTexture(TextureTarget.Texture2D, grid[i,j].Texture(view.CurrentTextureSize).ID);
+                    GL.Begin(PrimitiveType.Quads);
+                    for (byte h = 0; h < 4; h++)
+                    {
+                        GL.TexCoord2(vertices[h]);
+                        /*
+                        vertices[h].X *= view.CurrentTextureSize;
+                        vertices[h].Y *= view.CurrentTextureSize;
+                        vertices[h] += positionTopLeft;
+                        vertices[h].X += i;
+                        vertices[h].Y += j;*/
+                        //GL.Vertex2(vertices[h]);
+                        GL.Vertex2((vertices[h] + positionTopLeft + grid[i,j].PreciseLocation)*view.CurrentTextureSize);
+                    }
+                    GL.End();
+                }
+            }
         }
         public static void Begin(int screenWidth,int screenHeight)
         {
