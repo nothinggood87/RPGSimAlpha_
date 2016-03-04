@@ -11,18 +11,14 @@ namespace RPGSimAlpha
     {
         static class Physics
         {
-            public static Texture2D[] Textures { get; private set; }
             /// <summary>
             /// placeHolder
             /// </summary>
-            public const float MaxTorque = 0.1f;
+            public const float MaxTorque = 0.01f;
             /// <summary>
             /// placeHolder
             /// </summary>
-            public const float Thrust = 0.0625f;
-            /// <summary>
-            /// Land,Air (x)
-            /// </summary>
+            public const float Thrust = 0.125f;
         }
     }
 }

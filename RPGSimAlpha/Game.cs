@@ -33,18 +33,20 @@ namespace RPGSimAlpha
             }
         }
         public const int TileSize = 16;
+        public Galaxy Gal { get; }
         public ObjectHandler ObjHandler { get; } = new ObjectHandler();
         View View { get; }
-        public Game(int width,int height)
+        public Game(int width,int height,Galaxy gal)
             :base(width,height)
         {
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.BlendEquation(BlendEquationMode.Max);
-            View = new View(Vector2.Zero, 0.0, 1);
+            View = new View(Vector2.Zero, 0, 1);
             Resources.Master.Initualize();
             Input.Initialize(this);
+            Gal = gal;
         }
         protected override void OnLoad(EventArgs e)
         {
@@ -56,11 +58,10 @@ namespace RPGSimAlpha
             View.Refresh();
             TICK++;
             base.OnUpdateFrame(e);
-            RefreshWindowFrame();
-            ObjHandler.Update(View,WindowFrame);
+            //RefreshWindowFrame();
+            ObjHandler.Update(View,WindowFrame,Gal);
             //player.Update(level, Input.GetKeyInputVector2(Input.KeysDown), Input.GetKeyInputVector2(Input.KeysDownLast));
             //View.SetPosition(player.Position, View.TweenType.QuarticOut, 60);
-            View.Update();
             Input.Update();
         }
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -70,6 +71,7 @@ namespace RPGSimAlpha
             GL.ClearColor(Color.Black);
             SpriteBatch.Begin(this.Width, this.Height);
             View.ApplyTransform();
+            RefreshWindowFrame();
             ObjHandler.Render(WindowFrame,View);
             this.SwapBuffers();
         }
@@ -77,7 +79,7 @@ namespace RPGSimAlpha
         private void RefreshWindowFrame()
         {
             WindowFrame = new RectangleF(
-                (View.Position.X - ((Size.Width / 2) / View.Zoom)),(View.Position.Y - ((Size.Height / 2) / View.Zoom)), 
+                (float)(View.Position.X - ((Size.Width / 2) / View.Zoom)),(float)(View.Position.Y - ((Size.Height / 2) / View.Zoom)), 
                 Size.Width / View.Zoom, Size.Height/View.Zoom);
         }
     }

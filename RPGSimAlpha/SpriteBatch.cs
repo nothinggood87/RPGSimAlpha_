@@ -76,6 +76,8 @@ namespace RPGSimAlpha
                 GL.LoadMatrix(ref matrix);
             }
             GL.MatrixMode(MatrixMode.Modelview);
+            byte h;
+            RectangleF checking;
             for (short i = 0; i < width; i++)
             {
                 for (short j = 0; j < height; j++)
@@ -84,24 +86,21 @@ namespace RPGSimAlpha
                     {
                         if ((i % view.TextureDensity == 0 && j % view.TextureDensity == 0))
                         {
-                            Vector2 currentPosition = (grid[i,j].PreciseLocation * view.CurrentTextureSize) + (positionTopLeft * view.CurrentTextureSize);
-                            if (!windowFrame.IntersectsWith(new RectangleF(currentPosition.X, currentPosition.Y, view.CurrentTextureSize * 1.5f, view.CurrentTextureSize * 1.5f)))
+                            //checking = new RectangleF((grid[i, j].PreciseLocation.X + positionTopLeft.X), (grid[i, j].PreciseLocation.Y + positionTopLeft.Y), 1.5f, 1.5f);
+                            checking = new RectangleF(
+                                (grid[i, j].PreciseLocation.X + positionTopLeft.X), (grid[i, j].PreciseLocation.Y + positionTopLeft.Y),
+                                1f * view.Zoom, 1f * view.Zoom);
+                            if (!windowFrame.IntersectsWith(checking))
                                 continue;
+
                         }
                     }
-                    GL.BindTexture(TextureTarget.Texture2D, grid[i,j].Texture(view.CurrentTextureSize).ID);
+                    GL.BindTexture(TextureTarget.Texture2D, grid[i,j].Texture(view.TextureSize).ID);
                     GL.Begin(PrimitiveType.Quads);
-                    for (byte h = 0; h < 4; h++)
+                    for (h = 0; h < 4; h++)
                     {
                         GL.TexCoord2(vertices[h]);
-                        /*
-                        vertices[h].X *= view.CurrentTextureSize;
-                        vertices[h].Y *= view.CurrentTextureSize;
-                        vertices[h] += positionTopLeft;
-                        vertices[h].X += i;
-                        vertices[h].Y += j;*/
-                        //GL.Vertex2(vertices[h]);
-                        GL.Vertex2((vertices[h] + positionTopLeft + grid[i,j].PreciseLocation)*view.CurrentTextureSize);
+                        GL.Vertex2((vertices[h] + positionTopLeft + grid[i,j].PreciseLocation)*view.TextureSize);
                     }
                     GL.End();
                 }

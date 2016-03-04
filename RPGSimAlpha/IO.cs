@@ -104,8 +104,8 @@ namespace RPGSimAlpha
                     i++;
                     textureSize /= 4;
                 }
-                if (name > BlockRegistry.BlockTypes.WingRightEdge)
-                    return Textures[i,(int)CoreTypes.Generic][(int)(name - BlockRegistry.BlockTypes.WingRightEdge)];
+                if (name > BlockRegistry.BlockTypes.Collector)
+                    return Textures[i,(int)CoreTypes.Generic][(int)(name - BlockRegistry.BlockTypes.Collector)];
                 return Textures[i,(int)CoreTypes.Craft][(int)name];
             }
             /// <summary>
@@ -124,6 +124,8 @@ namespace RPGSimAlpha
                 WingLeftEdge,
                 WingMid,
                 WingRightEdge,
+                SolarPanel,
+                Collector,
             }
             public enum Player
             {
@@ -169,7 +171,7 @@ namespace RPGSimAlpha
                             int gid = int.Parse(tiles[i].Attributes["gid"].Value);
                             subline += 10;
                             subline += (short)gid;
-                            grid[x, y] = new Block((BlockRegistry.BlockTypes)gid-1);
+                            grid[x, y] = new Block((BlockRegistry.BlockTypes)gid-1,grid,x,y);
                             x++;
                             if (x >= width)
                             {

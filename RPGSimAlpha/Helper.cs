@@ -16,23 +16,11 @@ namespace RPGSimAlpha
                 if (number > 0) { return 1; }
                 return -1;
             }
-            public static int GetPositive(int number)
+            public static sbyte GetSign(float number)
             {
-                if (number > 0)
-                    return number;
-                return number * -1;
-            }
-            public static float GetPositive(float number)
-            {
-                if (number > 0)
-                    return number;
-                return number * -1;
-            }
-            public static double GetPositive(double number)
-            {
-                if (number > 0)
-                    return number;
-                return number * -1;
+                if (number == 0) { return 0; }
+                if (number > 0) { return 1; }
+                return -1;
             }
             public static int[] GetDisplacement(int[] baseValue, int[] otherValue) => new int[]
             {
@@ -64,7 +52,7 @@ namespace RPGSimAlpha
                 GetSign(displacement[1]),
                 };
 
-                if (GetPositive(displacement[0]) > GetPositive(displacement[1]))
+                if (Math.Abs(displacement[0]) > Math.Abs(displacement[1]))
                 {
                     value[1] = 0;
                 }
@@ -89,24 +77,12 @@ namespace RPGSimAlpha
             /// </summary>
             /// <param name="coords"></param>
             /// <returns></returns>
-            public static OpenTK.Vector2 GetPolarCoords(OpenTK.Vector2 coords)
+            public static OpenTK.Vector2 GetPolarCoords(OpenTK.Vector2 value)
             {
-                OpenTK.Vector2 retValue = OpenTK.Vector2.Zero;
-                retValue.X = coords.Length;
-                double theta = Math.Atan(coords.Y/coords.X);
-                if (coords.X < 0 || coords.Y < 0)
-                {
-                    retValue.X *= -1;
-                    if (coords.X < 0 && coords.Y < 0 && 8 == 15)
-                    { theta = Resources.Helper.GetPositive(theta); }
-                }
-                if (coords.X >= 0 && coords.Y < 0 && 1 == 2)
-                {
-                    retValue.X = -retValue.X;
-                    //theta = Resources.Helper.GetPositive(theta);
-                }
-                retValue.Y = (float)theta;
-                return retValue;
+                OpenTK.Vector2 vector = new OpenTK.Vector2(value.Length,(value.X != 0 ? (float)Math.Atan(value.Y / value.X) : (value.Y < 0 ? (float)Math.PI : 0))
+                    + (GetSign(value.X) == 1 ? 1.5f : 0.5f) * (float)Math.PI);//fix errors
+                //fix errors
+                return vector;
             }
         }
     }

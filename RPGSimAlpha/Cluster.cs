@@ -11,26 +11,25 @@ namespace RPGSimAlpha
 {
     class Cluster
     {
-        public void Update(View view,ref RectangleF windowFrame)
+        public void Update(View view,Galaxy gal,ref RectangleF windowFrame)
         {
-            Leader.Update(this,view);
             positionTopLeft += Velocity;
             CurrentRotation += Rotation;
-            if (CurrentRotation >= 6.28319)
+            const float circle = 2 * (float)Math.PI;
+            if (CurrentRotation >= circle)
             {
-                CurrentRotation -= 6.28319f;
+                CurrentRotation -= circle;
             }
-            else if(CurrentRotation <= -6.28319)
+            else if(CurrentRotation < 0)
             {
-                CurrentRotation += 6.28319f;
+                CurrentRotation += circle;
             }
             RefreshTooFarAway(view,ref windowFrame);
+            UpdateGalacticLocation(gal);
             if (!TooFarAway)
             {
                 RefreshPreciseLocation();
             }
-            //if (CurrentRotation > 8) { CurrentRotation = 1; }
-            //Console.WriteLine("UpdatedCluster");
         }
         private void RefreshTooFarAway(View view,ref RectangleF windowFrame,bool forceRender = false)
         {
@@ -39,15 +38,12 @@ namespace RPGSimAlpha
                 //TooFarAway = false;
                 return;
             }
-            Vector2 position = ((PositionTopLeft + (CenterOfMass / View.MaxTextureSize)) * view.CurrentTextureSize);
+            Vector2 position = ((PositionTopLeft + (CenterOfMass / (View.MaxTextureSize/View.MaxTextureSize)) - Velocity));
             RectangleF renderFrame = new RectangleF(
                 (position.X - ((Width / 2) / view.Zoom)), (position.Y - ((Height / 2) / view.Zoom)),
                 (Width / view.Zoom), (Height / view.Zoom));
             if (windowFrame.IntersectsWith(renderFrame))
             {
-                //Console.WriteLine(position);
-                //Console.WriteLine();
-                //Console.WriteLine(renderFrame);
                 TooFarAway = false;
             }
             else
@@ -58,9 +54,7 @@ namespace RPGSimAlpha
         public void Draw(View view,ref RectangleF windowFrame)
         {
             if (!TooFarAway)
-            {
-                SpriteBatch.Draw(Grid, PositionTopLeft,ref windowFrame, view, -CurrentRotation);
-            }
+                SpriteBatch.Draw(Grid, PositionTopLeft, ref windowFrame, view, -CurrentRotation);
         }
         public Vector2 CenterOfMass { get; private set; }
         /// <summary>
@@ -69,9 +63,7 @@ namespace RPGSimAlpha
         private bool TooFarAway { get; set; }
         public float Rotation { get; private set; }
         public float CurrentRotation { get; private set; }
-        private Controller Leader { get; }
-        public Vector2 Velocity => velocity;
-        private Vector2 velocity;
+        public Vector2 Velocity;
         private Vector2 positionTopLeft;
         public Vector2 PositionTopLeft => positionTopLeft;
         public enum Shape : byte
@@ -79,58 +71,32 @@ namespace RPGSimAlpha
             Circle = 0,
             Rectangle,
         }
-        public Cluster(Shape shape,Resources.BlockRegistry.BlockTypes type,Vector2 positionTopLeft,Vector2 velocity,float rotation, short valueA,short valueB,Controller.ControlType leader)
+        public Cluster(Block[,] grid,Vector2 positionTopLeft, Vector2 velocity, float rotation,ushort[] sectorBlock,Galaxy gal)
         {
-            Leader = new Controller(leader,this);
-            Rotation = rotation;
-            this.velocity = velocity;
-            bool circle = false;
-            this.positionTopLeft = positionTopLeft;
-            short[] centerCoords = new short[2];
-            if(shape == Shape.Circle)
-            {
-                circle = true;
-                centerCoords = new short[2]
-                {
-                    valueA,
-                    valueB,
-                };
-                centerCoords[0] /= 2;
-                centerCoords[1] /= 2;
-            }
-            Grid = new Block[valueA, valueB];
-            for(short i = 0;i<valueA;i++)
-            {
-                for(short j = 0;j< valueB;j++)
-                {
-                    if(circle)
-                    {
-                        if (Resources.Helper.GetVector(centerCoords, new short[] { i, j }) > valueA)
-                            continue;
-                    }
-                    Grid[i, j] = new Block(type);
-                }
-            }
-            RefreshMass();
-            RefreshThrust();
-            RefreshCenterOfMass();
-            RefreshRenderFrame(1,16);
-            Radius = (float)Math.Sqrt(Math.Pow(Height, 2) + Math.Pow(Width, 2));
-        }
-        public Cluster(Block[,] grid,Vector2 positionTopLeft, Vector2 velocity, float rotation,Controller.ControlType leader)
-        {
-            Leader = new Controller(leader,this);
+            
             Grid = grid;
             Rotation = rotation;
-            this.velocity = velocity;
+            this.Velocity = velocity;
             this.positionTopLeft = positionTopLeft;
             short[] centerCoords = new short[2];
             RefreshMass();
-            RefreshThrust();
             RefreshCenterOfMass();
             RefreshRenderFrame(1,16);
             Radius = (float)Math.Sqrt(Math.Pow(Height, 2) + Math.Pow(Width, 2));
+            CurrentSectorBlock = sectorBlock;
+            CurrentSector = SectorBlock.GetNearestSectorCoords(ref positionTopLeft);
+            gal.SetSectorBlock(this);
         }
+        private void UpdateGalacticLocation(Galaxy gal)
+        {
+                bool OutOfSectorBounds = SectorBlock.OutOfSectorBounds(ref CurrentSector[0], ref CurrentSector[1], ref positionTopLeft);
+
+            if (OutOfSectorBounds)
+                gal.RefreshCurrentSector(this, ref positionTopLeft);
+                  
+        }
+        public ushort[] CurrentSectorBlock { get; set; }
+        public ushort[] CurrentSector { get; set; }
         public uint ClusterId { get; }
         private Block[,] Grid { get; }
         public Block this[int x, int y]
@@ -160,33 +126,25 @@ namespace RPGSimAlpha
         }
         private void RefreshPreciseLocation()
         {
-            for (short x = 0; x < Grid.GetLength(0); x++)
+            float X , Y;
+            float distance;
+            double theta;
+            short x , y;
+            for (x = 0; x < Grid.GetLength(0); x++)
             {
-                for (short y = 0; y < Grid.GetLength(1); y++)
+                for (y = 0; y < Grid.GetLength(1); y++)
                 {
                     //about half
                     //getting base values
-                    float X = x - CenterOfMass.X;
-                    float Y = y - CenterOfMass.Y;
-                    float distance = (float)Math.Sqrt((X * X) + (Y * Y));
-                    //converting to polar coordinates
-                    double theta = Math.Atan(Y / X);
-                    //if(theta == double.NaN) { theta = 0;Console.WriteLine("Found NaN"); }
-                    //if (theta / theta != 1 && theta != 0) { theta = 0; }
-                    theta += CurrentRotation;
-                    if (X < 0 || Y < 0)
-                    {
-                        distance *= -1;
-                        if (X < 0 && Y < 0 && 8 == 15)
-                        { theta = Resources.Helper.GetPositive(theta); }
-                    }
-                    if (X >= 0 && Y < 0)
-                    {
+                    X = x - CenterOfMass.X;
+                    Y = y - CenterOfMass.Y;
+                    distance = (float)Math.Sqrt((X * X) + (Y * Y));
+                    if (X < 0)
                         distance = -distance;
-                        //theta = Resources.Helper.GetPositive(theta);
-                    }
-                    //converting to cartesian coordinates
-                    Grid[x,y].SetPreciseLocation(new Vector2(
+                    //converting to polar coordinates
+                    theta = Math.Atan(Y / X);
+                    theta += CurrentRotation;
+                    Grid[x, y].SetPreciseLocation(new Vector2(
                         distance * (float)Math.Cos(theta),
                         distance * (float)Math.Sin(theta)
                         ));
@@ -202,24 +160,22 @@ namespace RPGSimAlpha
                 {
                     if (Grid[i, j].Mass != 0) 
                     {
-                        centerOfMass[0] += Grid[i, j].Mass * i;
-                        centerOfMass[1] += Grid[i, j].Mass * j;
+                        centerOfMass[0] += Grid[i, j].Mass * (i + 1);
+                        centerOfMass[1] += Grid[i, j].Mass * (j + 1);
                     }
                 }
             }
             centerOfMass[0] /= Mass;
             centerOfMass[1] /= Mass;
+            centerOfMass[0]--;
+            centerOfMass[1]--;
             CenterOfMass = new Vector2((float)centerOfMass[0], (float)centerOfMass[1]);
-            Console.WriteLine(CenterOfMass[0] + " | " + CenterOfMass[1]);
+            Console.WriteLine( "Center Of Mass = " + CenterOfMass[0] + " | " + CenterOfMass[1]);
         }
-        /// <summary>
-        /// kiloNewtons
-        /// </summary>
-        private float Thrust { get; set; }
         /// <summary>
         /// kiloGrams
         /// </summary>
-        private double Mass { get; set; }
+        public double Mass { get; private set; }
         private RectangleF RenderFrame { get; set; }
         private float Radius { get; }
         private void RefreshRenderFrame(float zoom,byte textureSize)
@@ -240,24 +196,6 @@ namespace RPGSimAlpha
                 }
             }
         }
-        private void RefreshThrust()
-        {
-            Thrust = 0;
-            for (short i = 0; i < Width; i++)
-            {
-                for (short j = 0; j < Height; j++)
-                {
-                    if (Grid[i, j].Type == Resources.BlockRegistry.BlockTypes.ThrusterIon)
-                        Thrust += Resources.Physics.Thrust; 
-                }
-            }
-        }
-        private bool InView(RectangleF viewFrame) => viewFrame.IntersectsWith(new RectangleF(PositionTopLeft.X, PositionTopLeft.Y, Width, Height));
-        public void AccelerateForward()
-        {
-            velocity.X += (float)((Thrust * Math.Sin(CurrentRotation))/(Mass));
-            velocity.Y -= (float)((Thrust * Math.Cos(CurrentRotation))/(Mass));
-        }
         /// <summary>
         /// placeHolder
         /// </summary>
@@ -267,7 +205,7 @@ namespace RPGSimAlpha
             if ((Rotation < -Resources.Physics.MaxTorque && direction < 0)||
                 (Rotation > Resources.Physics.MaxTorque && direction > 0))
                 return;
-            Rotation += (float)(Resources.Helper.GetSign(direction)/Mass);
+            Rotation += (float)(direction/Mass);
         }
         /// <summary>
         /// accelerates the torque in the direction that will slow it down. 

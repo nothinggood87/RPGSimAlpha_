@@ -17,11 +17,10 @@ namespace RPGSimAlpha
         public void Refresh()
         {
             if (Zoom * 16 <= 1)
-                CurrentTextureSize = 1;
+                TextureSize = 1;
             else if (Zoom * 4 <= 1)
-                CurrentTextureSize = 4;
-            else CurrentTextureSize = MaxTextureSize;
-
+                TextureSize = 4;
+            else TextureSize = MaxTextureSize;
             TextureDensity = (byte)(1 / (Zoom * MaxTextureSize));
 
             if (TextureDensity == 0)
@@ -29,118 +28,30 @@ namespace RPGSimAlpha
 
         }
         public const byte MaxTextureSize = 16;
-        public enum TweenType
-        {
-            Instant = 0,
-            Linear,
-            QuadraticInOut,
-            CubicInOut,
-            QuarticOut,
-        }
         public Vector2 Position { get; private set; }
         /// <summary>
         /// in radians + = clockwise
         /// </summary>
-        public double Rotation { get; set; }
-        /// <summary>
-        /// 1 = default
-        /// </summary>
+        public float Rotation { get; set; }
         public float Zoom { get; set; }
-        public Vector2 PositionGoTo { get; private set; }
-        private Vector2 PositionFrom { get; set; }
-        private TweenType TwnType { get; set; }
-        private int CurrentStep { get; set; }
-        private int TweenSteps { get; set; }
-        public byte CurrentTextureSize { get; private set; } = 16;
+        public byte TextureSize { get; private set; } = 16;
         public byte TextureDensity { get; private set; } = 1;
-        public View(Vector2 startPosition,double startRotation = 1.0,float startZoom = 1.0f)
+        public View(Vector2 startPosition,float startRotation = 1,float startZoom = 1.0f)
         {
             Position = startPosition;
             Rotation = startRotation;
             Zoom = startZoom;
         }
-        public void Update()
-        {
-            if(CurrentStep < TweenSteps)
-            {
-                CurrentStep++;
-                switch(TwnType)
-                {
-                    case TweenType.Instant:
-                        {
-                            Position = PositionGoTo;
-                            break;
-                        }
-                    case TweenType.Linear:
-                        {
-                            Position = PositionFrom + (PositionGoTo - PositionFrom) * 
-                                GetLinear((float)CurrentStep / TweenSteps);
-                            break;
-                        }
-                    case TweenType.QuadraticInOut:
-                        {
-                            Position = PositionFrom + (PositionGoTo - PositionFrom) *
-                                GetQuadraticInOut((float)CurrentStep / TweenSteps);
-                            break;
-                        }
-                    case TweenType.CubicInOut:
-                        {
-                            Position = PositionFrom + (PositionGoTo - PositionFrom) *
-                                GetCubicInOut((float)CurrentStep / TweenSteps);
-                            break;
-                        }
-                    case TweenType.QuarticOut:
-                        {
-                            Position = PositionFrom + (PositionGoTo - PositionFrom) *
-                                GetQuarticOut((float)CurrentStep / TweenSteps);
-                            break;
-                        }
-                }
-            }
-            else
-            {
-                Position = PositionGoTo;
-            }
-        }
-        public void SetPosition(Vector2 newPosition) => SetPosition(newPosition, TweenType.Instant, 0);
-        public void SetPosition(Vector2 newPosition,TweenType type , int numSteps)
-        {
-            this.PositionFrom = Position;
-            this.Position = newPosition;
-            this.PositionGoTo = newPosition;
-            TwnType = type;
-            CurrentStep = 0;
-            TweenSteps = numSteps;
-        }
-        public float GetLinear(float t)
-        {
-            return t;
-        }
-
-        public float GetQuadraticInOut(float t)
-        {
-            return (t * t) / ((2 * t * t) - (2 * t) + 1);
-        }
-
-        public float GetCubicInOut(float t)
-        {
-            return (t * t * t) / ((3 * t * t) - (3 * t) + 1);
-        }
-
-        public float GetQuarticOut(float t)
-        {
-            return -((t - 1) * (t - 1) * (t - 1) * (t - 1)) + 1;
-        }
+        public void SetPosition(Vector2 newPosition) => this.Position = newPosition;
         public void ApplyTransform()
         {
             //adjusts for texture size changes
-            float zoom = (float)(Zoom * (16 /CurrentTextureSize));
+            float zoom = (float)(Zoom * (16 /TextureSize));
             try
             {
                 Matrix4 transform = Matrix4.Identity;
-
-                transform = Matrix4.Mult(transform,Matrix4.CreateTranslation(-Position.X, -Position.Y, 0));
-                transform = Matrix4.Mult(transform,Matrix4.CreateRotationZ(-(float)Rotation));
+                transform = Matrix4.Mult(transform,Matrix4.CreateTranslation(-Position.X*TextureSize, -Position.Y * TextureSize, 0));
+                transform = Matrix4.Mult(transform,Matrix4.CreateRotationZ(-Rotation));
                 transform = Matrix4.Mult(transform,Matrix4.CreateScale(zoom, zoom, 1.0f));
                 GL.MultMatrix(ref transform);
             }

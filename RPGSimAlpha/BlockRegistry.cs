@@ -17,6 +17,8 @@ namespace RPGSimAlpha
                 WingLeftEdge,
                 WingMid,
                 WingRightEdge,
+                SolarPanel,
+                Collector,
                 BadGuy,
                 Bullet,
                 Empty,
@@ -26,17 +28,19 @@ namespace RPGSimAlpha
             }
             public static BlockTemplate[] Registry { get; } = new BlockTemplate[]
             {
-                new BlockTemplate(BlockTypes.ThrusterIon,2.25f),
-                new BlockTemplate(BlockTypes.WingBack,0.25f),
-                new BlockTemplate(BlockTypes.WingLeftEdge,0.5f),
-                new BlockTemplate(BlockTypes.WingMid,1),
-                new BlockTemplate(BlockTypes.WingRightEdge,0.5f),
-                new BlockTemplate(BlockTypes.BadGuy,0.5f),
+                new BlockTemplate(BlockTypes.ThrusterIon,500),
+                new BlockTemplate(BlockTypes.WingBack,270),
+                new BlockTemplate(BlockTypes.WingLeftEdge,2700/5),
+                new BlockTemplate(BlockTypes.WingMid,2700/4),
+                new BlockTemplate(BlockTypes.WingRightEdge,2700/5),
+                new BlockTemplate(BlockTypes.SolarPanel,150),
+                new BlockTemplate(BlockTypes.Collector,300f),
+                new BlockTemplate(BlockTypes.BadGuy,220),
                 new BlockTemplate(BlockTypes.Bullet,0.03125f),
                 new BlockTemplate(BlockTypes.Empty,0,false),
-                new BlockTemplate(BlockTypes.Ladder,0.125f,false,false,true),
-                new BlockTemplate(BlockTypes.LadderPlatform,0.15f,false,true,true),
-                new BlockTemplate(BlockTypes.Solid,2),
+                new BlockTemplate(BlockTypes.Ladder,17.6f,false,false,true),
+                new BlockTemplate(BlockTypes.LadderPlatform,20,false,true,true),
+                new BlockTemplate(BlockTypes.Solid,2700),
             };
         }
         struct BlockTemplate
